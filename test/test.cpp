@@ -2,7 +2,8 @@
 #include "catch2/catch_test_macros.hpp"
 #include "AdjacencyList.h"
 
-// Andres Chavez, 26934004
+// Name: Andres Chavez
+// UFID: 26934004
 
 TEST_CASE("Basic two-page link", "[pagerank][basic]") {
     // Testing basic one-way link from miko.com to suisei.com
