@@ -25,24 +25,12 @@ public:
     }
 
     // Compute the PageRank using 'powerIterations' steps
-    void computePageRank(int powerIterations) {
-        int N = adjList.size();
-        if (N == 0) return;
 
-        // Initialize all ranks to 1/N
-        for (const auto& pair : adjList) {
-            ranks[pair.first] = 1.0 / N;
-        }
+    void computePageRank(int powerIterations);
 
-        // Dummy page rank computation: does nothing for now
-        for (int i = 0; i < powerIterations; ++i) {
-            unordered_map<string, double> newRanks = ranks;
-
-            // STUB: this is where you'd implement rank propagation
-            // For now, copy same values
-            ranks = newRanks;
-        }
-    }
+    // string PageRank(int n); <--- this is the one they (the project template) want me to add for my tests I think
+    // computePageRank is meant to replace PageRank, its already sorta implemented so I dont want to delete it....
+    //
 
     // Returns a map of URL to its final rank
     map<string, double> getRanks() const {

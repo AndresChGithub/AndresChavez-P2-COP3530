@@ -1,7 +1,9 @@
 #define CATCH_CONFIG_MAIN
 #include "catch2/catch_test_macros.hpp"
+#include "catch2/catch_approx.hpp"
+#include "AdjacencyList.h"
 
-#include "AdjacencyList.h" // Replace with your actual header
+using Catch::Approx;
 
 TEST_CASE("Basic two-page link", "[pagerank][basic]") {
     AdjacencyList g;
