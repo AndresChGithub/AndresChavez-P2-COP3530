@@ -1,9 +1,6 @@
 #define CATCH_CONFIG_MAIN
 #include "catch2/catch_test_macros.hpp"
-#include "catch2/catch_approx.hpp"
 #include "AdjacencyList.h"
-
-using Catch::Approx;
 
 TEST_CASE("Basic two-page link", "[pagerank][basic]") {
     AdjacencyList g;
@@ -13,8 +10,8 @@ TEST_CASE("Basic two-page link", "[pagerank][basic]") {
     auto result = g.getRanks();
 
     REQUIRE(result.size() == 2);
-    REQUIRE(result["a.com"] == Approx(0.0).margin(0.01));
-    REQUIRE(result["b.com"] == Approx(1.0).margin(0.01));
+    REQUIRE(result["a.com"] == 0.0);
+    REQUIRE(result["b.com"] == 1.0);
 }
 
 TEST_CASE("Page pointing to itself", "[pagerank][loop]") {
@@ -25,7 +22,7 @@ TEST_CASE("Page pointing to itself", "[pagerank][loop]") {
     auto result = g.getRanks();
 
     REQUIRE(result.size() == 1);
-    REQUIRE(result["loop.com"] == Approx(1.0).margin(0.01));
+    REQUIRE(result["loop.com"] == 1.0);
 }
 
 TEST_CASE("Page with no incoming links", "[pagerank][dangling]") {
@@ -37,8 +34,8 @@ TEST_CASE("Page with no incoming links", "[pagerank][dangling]") {
     auto result = g.getRanks();
 
     REQUIRE(result.size() == 3);
-    REQUIRE(result["a.com"] == Approx(0.0).margin(0.01));
-    REQUIRE(result["b.com"] + result["c.com"] == Approx(1.0).margin(0.01));
+    REQUIRE(result["a.com"] == 0.0);
+    REQUIRE(result["b.com"] + result["c.com"] == 1.0);
 }
 
 TEST_CASE("Disconnected graph components", "[pagerank][components]") {
@@ -65,6 +62,6 @@ TEST_CASE("Stable rank after multiple iterations", "[pagerank][convergence]") {
     auto result = g.getRanks();
     REQUIRE(result.size() == 3);
 
-    REQUIRE(result["a.com"] == Approx(result["b.com"]).margin(0.01));
-    REQUIRE(result["b.com"] == Approx(result["c.com"]).margin(0.01));
+    REQUIRE(result["a.com"] == result["b.com"]);
+    REQUIRE(result["b.com"] == result["c.com"]);
 }
