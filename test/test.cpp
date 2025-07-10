@@ -1,76 +1,68 @@
-#include <catch2/catch_test_macros.hpp>
-#include <iostream>
+#define CATCH_CONFIG_MAIN
+#include "catch2/catch_test_macros.hpp"
 
-// change if you choose to use a different header name
-#include "AdjacencyList.h"
+#include "AdjacencyList.h" // Replace with your actual header
 
-using namespace std;
+TEST_CASE("Basic two-page link", "[pagerank][basic]") {
+    AdjacencyList g;
+    g.addEdge("a.com", "b.com");
+    g.computePageRank(1);
 
-// the syntax for defining a test is below. It is important for the name to be
-// unique, but you can group multiple tests with [tags]. A test can have
-// [multiple][tags] using that syntax.
-TEST_CASE("Example Test Name - Change me!", "[tag]") {
-  // instantiate any class members that you need to test here
-  int one = 1;
+    auto result = g.getRanks();
 
-  // anything that evaluates to false in a REQUIRE block will result in a
-  // failing test
-  REQUIRE(one == 0); // fix me!
-
-  // all REQUIRE blocks must evaluate to true for the whole test to pass
-  REQUIRE(false); // also fix me!
+    REQUIRE(result.size() == 2);
+    REQUIRE(result["a.com"] == Approx(0.0).margin(0.01));
+    REQUIRE(result["b.com"] == Approx(1.0).margin(0.01));
 }
 
-TEST_CASE("Test 2", "[tag]") {
-  // you can also use "sections" to share setup code between tests, for example:
-  int one = 1;
+TEST_CASE("Page pointing to itself", "[pagerank][loop]") {
+    AdjacencyList g;
+    g.addEdge("loop.com", "loop.com");
+    g.computePageRank(5);
 
-  SECTION("num is 2") {
-    int num = one + 1;
-    REQUIRE(num == 2);
-  };
+    auto result = g.getRanks();
 
-  SECTION("num is 3") {
-    int num = one + 2;
-    REQUIRE(num == 3);
-  };
-
-  // each section runs the setup code independently to ensure that they don't
-  // affect each other
+    REQUIRE(result.size() == 1);
+    REQUIRE(result["loop.com"] == Approx(1.0).margin(0.01));
 }
 
-// You must write 5 unique, meaningful tests for credit on the testing section
-// of this project!
+TEST_CASE("Page with no incoming links", "[pagerank][dangling]") {
+    AdjacencyList g;
+    g.addEdge("a.com", "b.com");
+    g.addEdge("a.com", "c.com");
 
-// See the following for an example of how to easily test your output.
-// This uses C++ "raw strings" and assumes your PageRank outputs a string with
-//   the same thing you print.
-TEST_CASE("Example PageRank Output Test", "[flag]") {
-  // the following is a "raw string" - you can write the exact input (without
-  //   any indentation!) and it should work as expected
-  string input = R"(7 2
-google.com gmail.com
-google.com maps.com
-facebook.com ufl.edu
-ufl.edu google.com
-ufl.edu gmail.com
-maps.com facebook.com
-gmail.com maps.com)";
+    g.computePageRank(10);
+    auto result = g.getRanks();
 
-  string expectedOutput = R"(facebook.com 0.20
-gmail.com 0.20
-google.com 0.10
-maps.com 0.30
-ufl.edu 0.20
-)";
+    REQUIRE(result.size() == 3);
+    REQUIRE(result["a.com"] == Approx(0.0).margin(0.01));
+    REQUIRE(result["b.com"] + result["c.com"] == Approx(1.0).margin(0.01));
+}
 
-  string actualOutput;
+TEST_CASE("Disconnected graph components", "[pagerank][components]") {
+    AdjacencyList g;
+    g.addEdge("a.com", "b.com");   // Component 1
+    g.addEdge("x.com", "y.com");   // Component 2
 
-  // somehow pass your input into your AdjacencyList and parse it to call the
-  // correct functions, for example:
-  //  AdjacencyList g;
-  //  g.parseInput(input)
-  //  actualOutput = g.getStringRepresentation()
+    g.computePageRank(2);
+    auto result = g.getRanks();
 
-  REQUIRE(actualOutput == expectedOutput);
+    REQUIRE(result.size() == 4);
+    REQUIRE(result["b.com"] > result["a.com"]);
+    REQUIRE(result["y.com"] > result["x.com"]);
+}
+
+TEST_CASE("Stable rank after multiple iterations", "[pagerank][convergence]") {
+    AdjacencyList g;
+    g.addEdge("a.com", "b.com");
+    g.addEdge("b.com", "c.com");
+    g.addEdge("c.com", "a.com");
+
+    g.computePageRank(100);  // simulate convergence
+
+    auto result = g.getRanks();
+    REQUIRE(result.size() == 3);
+
+    REQUIRE(result["a.com"] == Approx(result["b.com"]).margin(0.01));
+    REQUIRE(result["b.com"] == Approx(result["c.com"]).margin(0.01));
 }
