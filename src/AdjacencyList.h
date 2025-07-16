@@ -1,42 +1,68 @@
 #ifndef ADJACENCYLIST_H
 #define ADJACENCYLIST_H
 
-#include <string>
-#include <map>
-#include <set>
-#include <vector>
 #include <unordered_map>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <iomanip>
+#include <algorithm>
 
 using namespace std;
 
 class AdjacencyList {
 private:
-    unordered_map<string, set<string>> adjList;
-    unordered_map<string, double> ranks;
+    unordered_map<string, int> url_to_id;
+    vector<string> id_to_url;
+    vector<vector<int>> incoming_edges; // index i holds a list of nodes that link to i
+    vector<int> out_degree;
 
 public:
-    // Add a directed edge from 'from' to 'to'
     void addEdge(const string& from, const string& to) {
-        adjList[from].insert(to);
-        // Ensure both nodes exist in the map
-        if (adjList.find(to) == adjList.end()) {
-            adjList[to] = {};
+        int from_id = get_or_add_url(from);
+        int to_id = get_or_add_url(to);
+
+        incoming_edges[to_id].push_back(from_id);
+        out_degree[from_id]++;
+    }
+
+    void computePageRank(int power_iterations) {
+        int n = id_to_url.size();
+        vector<double> rank(n, 1.0 / n);
+
+        for (int iter = 0; iter < power_iterations; ++iter) {
+            vector<double> new_rank(n, 0.0);
+
+            for (int i = 0; i < n; ++i) {
+                for (int j : incoming_edges[i]) {
+                    new_rank[i] += rank[j] / out_degree[j];
+                }
+            }
+            rank = new_rank;
+        }
+
+        // Prepare for output
+        vector<pair<string, double>> results;
+        for (int i = 0; i < n; ++i)
+            results.push_back({id_to_url[i], rank[i]});
+
+        sort(results.begin(), results.end()); // Alphabetical order
+
+        for (auto& pair : results) {
+            cout << pair.first << " " << fixed << setprecision(2) << pair.second << endl;
         }
     }
 
-    // Compute the PageRank using 'powerIterations' steps
-
-    void computePageRank(int powerIterations);
-
-    // string PageRank(int n); <--- this is the one they (the project template) want me to add for my tests I think
-    // computePageRank is meant to replace PageRank, its already sorta implemented so I dont want to delete it....
-    //
-
-    // Returns a map of URL to its final rank
-    map<string, double> getRanks() const {
-        // Convert unordered_map to ordered map for deterministic test output
-        return map<string, double>(ranks.begin(), ranks.end());
+private:
+    int get_or_add_url(const string& url) {
+        if (url_to_id.count(url)) return url_to_id[url];
+        int id = url_to_id.size();
+        url_to_id[url] = id;
+        id_to_url.push_back(url);
+        incoming_edges.push_back({});
+        out_degree.push_back(0);
+        return id;
     }
 };
 
-#endif // ADJACENCYLIST_H
+#endif

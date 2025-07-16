@@ -17,21 +17,21 @@ using namespace std;
 
 // ^^^ all this came here with the template of the project, not deleting for now.
 
-void AdjacencyList::computePageRank(int powerIterations) {
-        int N = adjList.size();
-        if (N == 0) return;
+// void AdjacencyList::computePageRank(int powerIterations) {
+//         int N = adjList.size();
+//         if (N == 0) return;
 
-        // Initialize all ranks to 1/N
-        for (const auto& pair : adjList) {
-            ranks[pair.first] = 1.0 / N;
-        }
+//         // Initialize all ranks to 1/N
+//         for (const auto& pair : adjList) {
+//             ranks[pair.first] = 1.0 / N;
+//         }
 
-        // Dummy page rank computation: does nothing for now
-        for (int i = 0; i < powerIterations; ++i) {
-            unordered_map<string, double> newRanks = ranks;
+//         // Dummy page rank computation: does nothing for now
+//         for (int i = 0; i < powerIterations; ++i) {
+//             unordered_map<string, double> newRanks = ranks;
 
-            // STUB: this is where you'd implement rank propagation
-            // For now, copy same values
-            ranks = newRanks;
-        }
-    }
+//             // STUB: this is where you'd implement rank propagation
+//             // For now, copy same values
+//             ranks = newRanks;
+//         }
+//     }
