@@ -19,6 +19,7 @@ private:
     vector<double> rank; // store the latest ranks
 
 public:
+
     void addEdge(const string& from, const string& to) {
         int from_id = get_or_add_url(from);
         int to_id = get_or_add_url(to);
@@ -29,27 +30,27 @@ public:
 
     void computePageRank(int power_iterations) {
         int n = id_to_url.size();
-        rank.assign(n, 1.0 / n); // initialize ranks
-        double d = 0.85;
+        rank.assign(n, 1.0 / n); // Initialize all ranks to 1/N
 
         for (int iter = 0; iter < power_iterations; ++iter) {
-            vector<double> new_rank(n, (1.0 - d) / n);
+            vector<double> new_rank(n, 0.0);
 
-            double dangling_sum = 0.0;
-            for (int j = 0; j < n; ++j) {
-                if (out_degree[j] == 0) {
-                    dangling_sum += rank[j];
-                }
-            }
-
+            // Compute new ranks based on incoming links
             for (int i = 0; i < n; ++i) {
                 for (int j : incoming_edges[i]) {
                     if (out_degree[j] > 0) {
-                        new_rank[i] += d * rank[j] / out_degree[j];
+                        new_rank[i] += rank[j] / out_degree[j];
                     }
                 }
-                // Distribute dangling rank
-                new_rank[i] += d * dangling_sum / n;
+            }
+
+            // Normalize manually (sum all values then divide)
+            double sum = 0.0;
+            for (int i = 0; i < n; ++i) {
+                sum += new_rank[i];
+            }
+            for (int i = 0; i < n; ++i) {
+                new_rank[i] /= sum;
             }
 
             rank = new_rank;
