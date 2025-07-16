@@ -35,3 +35,24 @@ using namespace std;
 //             ranks = newRanks;
 //         }
 //     }
+
+// old computePageRank:
+
+    // void computePageRank(int power_iterations) {
+    //     int n = id_to_url.size();
+    //     rank.assign(n, 1.0 / n); // initialize ranks
+
+    //     for (int iter = 0; iter < power_iterations; ++iter) {
+    //         vector<double> new_rank(n, 0.0);
+
+    //         for (int i = 0; i < n; ++i) {
+    //             for (int j : incoming_edges[i]) {
+    //                 if (out_degree[j] > 0) {
+    //                     new_rank[i] += rank[j] / out_degree[j];
+    //                 }
+    //             }
+    //         }
+
+    //         rank = new_rank;
+    //     }
+    // }

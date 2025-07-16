@@ -30,21 +30,32 @@ public:
     void computePageRank(int power_iterations) {
         int n = id_to_url.size();
         rank.assign(n, 1.0 / n); // initialize ranks
+        double d = 0.85;
 
         for (int iter = 0; iter < power_iterations; ++iter) {
-            vector<double> new_rank(n, 0.0);
+            vector<double> new_rank(n, (1.0 - d) / n);
+
+            double dangling_sum = 0.0;
+            for (int j = 0; j < n; ++j) {
+                if (out_degree[j] == 0) {
+                    dangling_sum += rank[j];
+                }
+            }
 
             for (int i = 0; i < n; ++i) {
                 for (int j : incoming_edges[i]) {
                     if (out_degree[j] > 0) {
-                        new_rank[i] += rank[j] / out_degree[j];
+                        new_rank[i] += d * rank[j] / out_degree[j];
                     }
                 }
+                // Distribute dangling rank
+                new_rank[i] += d * dangling_sum / n;
             }
 
             rank = new_rank;
         }
     }
+
 
     unordered_map<string, double> getRanks() const {
         unordered_map<string, double> result;
