@@ -14,8 +14,9 @@ class AdjacencyList {
 private:
     unordered_map<string, int> url_to_id;
     vector<string> id_to_url;
-    vector<vector<int>> incoming_edges; // index i holds a list of nodes that link to i
+    vector<vector<int>> incoming_edges; // index i holds list of nodes that link to i
     vector<int> out_degree;
+    vector<double> rank; // store the latest ranks
 
 public:
     void addEdge(const string& from, const string& to) {
@@ -28,29 +29,29 @@ public:
 
     void computePageRank(int power_iterations) {
         int n = id_to_url.size();
-        vector<double> rank(n, 1.0 / n);
+        rank.assign(n, 1.0 / n); // initialize ranks
 
         for (int iter = 0; iter < power_iterations; ++iter) {
             vector<double> new_rank(n, 0.0);
 
             for (int i = 0; i < n; ++i) {
                 for (int j : incoming_edges[i]) {
-                    new_rank[i] += rank[j] / out_degree[j];
+                    if (out_degree[j] > 0) {
+                        new_rank[i] += rank[j] / out_degree[j];
+                    }
                 }
             }
+
             rank = new_rank;
         }
+    }
 
-        // Prepare for output
-        vector<pair<string, double>> results;
-        for (int i = 0; i < n; ++i)
-            results.push_back({id_to_url[i], rank[i]});
-
-        sort(results.begin(), results.end()); // Alphabetical order
-
-        for (auto& pair : results) {
-            cout << pair.first << " " << fixed << setprecision(2) << pair.second << endl;
+    unordered_map<string, double> getRanks() const {
+        unordered_map<string, double> result;
+        for (size_t i = 0; i < id_to_url.size(); ++i) {
+            result[id_to_url[i]] = rank[i];
         }
+        return result;
     }
 
 private:
