@@ -70,7 +70,7 @@ public:
         
         map<string, double> result;
 
-        for (size_t i = 0; i < id_to_url.size(); ++i) {
+        for (int i = 0; i < id_to_url.size(); ++i) {
             result[id_to_url[i]] = rank[i];
         }
 
