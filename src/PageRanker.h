@@ -11,49 +11,44 @@
 using namespace std;
 
 class PageRanker {
-
 private:
-
-    map<string, int> url_to_id;
+    map<string,int> url_to_id;
     vector<string> id_to_url;
     vector<vector<int>> incoming_edges; // the adjacency list
     vector<int> out_degree; // to count the number of outgoing degrees
-    vector<double> rank; // store the latest ranks
+    vector<double> rank;    // store the latest ranks
 
 public:
 
     void addEdge(const string& from, const string& to) {
-        int from_id = get_or_add_url(from);
-        int to_id = get_or_add_url(to);
+        int u = get_or_add_url(from);
+        int v = get_or_add_url(to);
 
         // this adds an edge: "from" -> "to"
-        incoming_edges[to_id].push_back(from_id);
-        out_degree[from_id]++;
+        incoming_edges[v].push_back(u);
+        out_degree[u]++;
     }
 
     void computePageRank(int power_iterations) {
-
         int n = id_to_url.size();
+        if (n == 0) return;
 
         rank = vector<double>(n, 1.0 / n);
 
-        for (int iter = 0; iter < power_iterations; ++iter) {
+        // we need (p − 1) matrix multiplies to get r(p−1)
+        int iters = max(0, power_iterations - 1);
+        for (int iter = 0; iter < iters; ++iter) {
             vector<double> new_rank(n, 0.0);
 
-            // Compute new ranks based on incoming links
-            for (int i = 0; i < n; ++i) {
-
-                for (int j : incoming_edges[i]) {
-
-                    if (out_degree[j] > 0) {
-                        new_rank[i] += rank[j] / out_degree[j];
+            // simple M · r: each v sums over its in-neighbors u
+            for (int v = 0; v < n; ++v) {
+                for (int u : incoming_edges[v]) {
+                    if (out_degree[u] > 0) {
+                        new_rank[v] += rank[u] / out_degree[u];
                     }
-
                 }
-
             }
-
-            // Normalize manually (sum all values then divide)
+            // using the normalization described in the project
             double sum = 0.0;
 
             for (int i = 0; i < n; ++i) {
@@ -65,10 +60,10 @@ public:
             }
 
             rank = new_rank;
-
         }
     }
 
+    // returns map<URL,rank> sorted by URL when iterated
     map<string, double> getRanks() const {
         
         map<string, double> result;
@@ -82,10 +77,7 @@ public:
     }
 
 private:
-
     int get_or_add_url(const string& url) {
-        // basically, if the URL already exists, return its ID
-        // if the function sees that its a new URL, it process it correctly
 
         if (url_to_id.find(url) != url_to_id.end()) {
             return url_to_id[url];
@@ -94,10 +86,9 @@ private:
         int id = url_to_id.size();
         url_to_id[url] = id;
         id_to_url.push_back(url);
-        incoming_edges.push_back({});
+        incoming_edges.emplace_back();
         out_degree.push_back(0);
         return id;
-
     }
 };
 

@@ -21,7 +21,7 @@ int main() {
 
     graph.computePageRank(power_iterations);
 
-    unordered_map<string, double> ranks = graph.getRanks();
+    map<string, double> ranks = graph.getRanks();
 
     // Convert to vector for sorting
     vector<pair<string, double>> sorted_ranks(ranks.begin(), ranks.end());

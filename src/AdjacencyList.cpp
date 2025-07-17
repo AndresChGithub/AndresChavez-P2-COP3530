@@ -1,5 +1,5 @@
 #include <iostream>
-#include "AdjacencyList.h"
+#include "PageRanker.h"
 
 using namespace std;
 
