@@ -16,17 +16,17 @@ private:
     vector<string> id_to_url;
     vector<vector<int>> incoming_edges; // the adjacency list
     vector<int> out_degree; // to count the number of outgoing degrees
-    vector<double> rank;    // store the latest ranks
+    vector<double> rank; // store the latest ranks
 
 public:
 
     void addEdge(const string& from, const string& to) {
-        int u = get_or_add_url(from);
-        int v = get_or_add_url(to);
+        int from_id = getOrAddURL(from);
+        int to_id = getOrAddURL(to);
 
         // this adds an edge: "from" -> "to"
-        incoming_edges[v].push_back(u);
-        out_degree[u]++;
+        incoming_edges[to_id].push_back(from_id);
+        out_degree[from_id]++;
     }
 
     void computePageRank(int power_iterations) {
@@ -35,30 +35,40 @@ public:
 
         rank = vector<double>(n, 1.0 / n);
 
-        // we need (p − 1) matrix multiplies to get r(p−1)
-        int iters = max(0, power_iterations - 1);
-        for (int iter = 0; iter < iters; ++iter) {
-            vector<double> new_rank(n, 0.0);
+        int num_iterations = power_iterations - 1;
+        if (num_iterations < 0) {
+            num_iterations = 0;
+        }
 
-            // simple M · r: each v sums over its in-neighbors u
-            for (int v = 0; v < n; ++v) {
-                for (int u : incoming_edges[v]) {
-                    if (out_degree[u] > 0) {
-                        new_rank[v] += rank[u] / out_degree[u];
+        for (int iter = 0; iter < num_iterations; iter++) {
+            // Create a new rank vector filled with 0s
+            vector<double> new_rank;
+            new_rank.resize(n, 0.0);
+
+            // For each node in the graph
+            for (int target = 0; target < n; target++) {
+                // Go through each node that links to this target node
+                vector<int> sources = incoming_edges[target];
+                for (int i = 0; i < sources.size(); i++) {
+                    int source = sources[i];
+                    
+                    // Only count if the source has outgoing links
+                    if (out_degree[source] > 0) {
+                        new_rank[target] += rank[source] / out_degree[source];
                     }
                 }
             }
-            // using the normalization described in the project
-            double sum = 0.0;
 
-            for (int i = 0; i < n; ++i) {
-                sum += new_rank[i];
+            // Normalize: make the total rank add up to 1
+            double total = 0.0;
+            for (int i = 0; i < n; i++) {
+                total += new_rank[i];
+            }
+            for (int i = 0; i < n; i++) {
+                new_rank[i] /= total;
             }
 
-            for (int i = 0; i < n; ++i) {
-                new_rank[i] /= sum;
-            }
-
+            // Save the updated ranks
             rank = new_rank;
         }
     }
@@ -77,7 +87,7 @@ public:
     }
 
 private:
-    int get_or_add_url(const string& url) {
+    int getOrAddURL(const string& url) {
 
         if (url_to_id.find(url) != url_to_id.end()) {
             return url_to_id[url];
@@ -86,7 +96,7 @@ private:
         int id = url_to_id.size();
         url_to_id[url] = id;
         id_to_url.push_back(url);
-        incoming_edges.emplace_back();
+        incoming_edges.push_back({});
         out_degree.push_back(0);
         return id;
     }
