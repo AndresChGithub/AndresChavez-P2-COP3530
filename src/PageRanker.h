@@ -12,6 +12,7 @@ using namespace std;
 
 class PageRanker {
 private:
+
     map<string,int> url_to_id;
     vector<string> id_to_url;
     vector<vector<int>> incoming_edges; // the adjacency list
@@ -51,21 +52,12 @@ public:
                 vector<int> sources = incoming_edges[target];
                 for (int i = 0; i < sources.size(); i++) {
                     int source = sources[i];
-                    
+
                     // Only count if the source has outgoing links
                     if (out_degree[source] > 0) {
                         new_rank[target] += rank[source] / out_degree[source];
                     }
                 }
-            }
-
-            // Normalize: make the total rank add up to 1
-            double total = 0.0;
-            for (int i = 0; i < n; i++) {
-                total += new_rank[i];
-            }
-            for (int i = 0; i < n; i++) {
-                new_rank[i] /= total;
             }
 
             // Save the updated ranks
