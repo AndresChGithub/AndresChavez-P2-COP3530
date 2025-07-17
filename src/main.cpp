@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "AdjacencyList.h"
+#include "PageRanker.h"
 
 using namespace std;
 
@@ -12,7 +12,7 @@ int main() {
     string from, to;
     cin >> no_of_lines >> power_iterations;
 
-    AdjacencyList graph;
+    PageRanker graph;
 
     for (int i = 0; i < no_of_lines; i++) {
         cin >> from >> to;

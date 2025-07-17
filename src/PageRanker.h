@@ -10,7 +10,8 @@
 
 using namespace std;
 
-class AdjacencyList {
+class PageRanker {
+
 private:
     unordered_map<string, int> url_to_id;
     vector<string> id_to_url;

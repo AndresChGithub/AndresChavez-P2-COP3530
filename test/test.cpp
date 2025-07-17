@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 #include "catch2/catch_test_macros.hpp"
-#include "AdjacencyList.h"
+#include "PageRanker.h"
 
 // Name: Andres Chavez
 // UFID: 26934004
@@ -8,7 +8,7 @@
 TEST_CASE("Basic two-page link", "[pagerank][basic]") {
     // Testing basic one-way link from miko.com to suisei.com
     // All rank should end up in suisei.com since she's the only one being pointed to
-    AdjacencyList g;
+    PageRanker g;
     g.addEdge("miko.com", "suisei.com");
     g.computePageRank(1);
 
@@ -22,7 +22,7 @@ TEST_CASE("Basic two-page link", "[pagerank][basic]") {
 TEST_CASE("Page pointing to itself", "[pagerank][loop]") {
     // Checking behavior of a self-loop — polka.com links to herself only
     // She should retain all the rank through every iteration
-    AdjacencyList g;
+    PageRanker g;
     g.addEdge("polka.com", "polka.com");
     g.computePageRank(5);
 
@@ -35,7 +35,7 @@ TEST_CASE("Page pointing to itself", "[pagerank][loop]") {
 TEST_CASE("Page with no incoming links", "[pagerank][dangling]") {
     // botan.com links to lamy.com and nene.com, but no one links to her
     // She should have a rank of 0, and lamy/nene split her rank
-    AdjacencyList g;
+    PageRanker g;
     g.addEdge("botan.com", "lamy.com");
     g.addEdge("botan.com", "nene.com");
 
@@ -50,7 +50,7 @@ TEST_CASE("Page with no incoming links", "[pagerank][dangling]") {
 TEST_CASE("Disconnected graph components", "[pagerank][components]") {
     // Two separate link pairs: subaru.com → okayu.com and fuwawa.com → mococo.com
     // The pages being linked to should get higher ranks than the ones linking
-    AdjacencyList g;
+    PageRanker g;
     g.addEdge("subaru.com", "okayu.com");
     g.addEdge("fuwawa.com", "mococo.com");
 
@@ -65,7 +65,7 @@ TEST_CASE("Disconnected graph components", "[pagerank][components]") {
 TEST_CASE("Stable rank after multiple iterations", "[pagerank][convergence]") {
     // Circular loop: pekora.com → korone.com → marine.com → pekora.com
     // After enough iterations, all pages should have equal rank
-    AdjacencyList g;
+    PageRanker g;
     g.addEdge("pekora.com", "korone.com");
     g.addEdge("korone.com", "marine.com");
     g.addEdge("marine.com", "pekora.com");
